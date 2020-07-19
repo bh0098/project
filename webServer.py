@@ -6,7 +6,7 @@ class WebServer:
     def __init__(self, port, ip, fileName):
         self.port = port
         self.ip = ip
-        self.listenNumber = 5
+        self.listenNumber = 1
         self.packetSize = 1024
         self.socket = self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.fileName = fileName
@@ -18,34 +18,30 @@ class WebServer:
         """
 
         self.socket.bind((self.ip, self.port))
-        self.socket.listen(self.listenNumper)
+        self.socket.listen(self.listenNumber)
+        self.printLine()
+        print("start for listening ")
 
-    def send_file_handler(socket, fileName):
+    def send_file_handler(self):
 
         """
-
-            :param socket:
             :param fileName: we use default file name in this server
             :return: data of file(string) and isFileExist (boolean)
         """
-
         data = ''
         try:
-            f = open(fileName, 'rb')
+            f = open(self.fileName, 'rb')
             line = f.read(1024)
             while (line):
-                # socket.send(line)
-                # print("line",line)
                 data += line.decode('utf-8')
-                # print("data on fn: ", data)
-                print('Sent ', repr(line))
                 line = f.read(1024)
             f.close()
             return data, True
         except:
+            print("file not exist")
             return data, False
 
-    def _generate_headers(response_code):
+    def _generate_headers(self, response_code):
         """
             Parameter : Response code (200 or 4040)
             Generate response Header
@@ -80,12 +76,14 @@ class WebServer:
             # print client message content
             msg = clientSock.recv(size).decode('utf-8')
             self.printLine()
+            print("sent message :")
             print(msg)
 
             # check for existance of file in the server (with name of file.txt)
-            data, isFileExist = self.send_file_handler(clientSock, self.fileName)
+            data, isFileExist = self.send_file_handler()
 
-            print('data of file -----------------------')
+            self.printLine()
+            print('data of file :')
             print(data)
 
             # create  header for response message
