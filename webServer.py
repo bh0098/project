@@ -1,86 +1,102 @@
-
 import socket
 
 
+class WebServer:
 
-def send_file_handler(socket, fileName='file.txt'):
-    """
+    def __init__(self, port, ip, fileName):
+        self.port = port
+        self.ip = ip
+        self.listenNumber = 5
+        self.packetSize = 1024
+        self.socket = self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.fileName = fileName
 
-    :param socket:
-    :param fileName: we use default file name in this server
-    :return: data of file(string) and isFileExist (boolean)
-    """
-    data = ''
-    try:
-        f = open(fileName, 'rb')
-        line = f.read(1024)
-        while (line):
-            # socket.send(line)
-            # print("line",line)
-            data +=line.decode('utf-8')
-            # print("data on fn: ", data)
-            print('Sent ', repr(line))
+    def start(self):
+
+        """
+        start connection and listen for signal
+        """
+
+        self.socket.bind((self.ip, self.port))
+        self.socket.listen(self.listenNumper)
+
+    def send_file_handler(socket, fileName):
+
+        """
+
+            :param socket:
+            :param fileName: we use default file name in this server
+            :return: data of file(string) and isFileExist (boolean)
+        """
+
+        data = ''
+        try:
+            f = open(fileName, 'rb')
             line = f.read(1024)
-        f.close()
-        return data,True
-    except:
-        return data,False
+            while (line):
+                # socket.send(line)
+                # print("line",line)
+                data += line.decode('utf-8')
+                # print("data on fn: ", data)
+                print('Sent ', repr(line))
+                line = f.read(1024)
+            f.close()
+            return data, True
+        except:
+            return data, False
 
+    def _generate_headers(response_code):
+        """
+            Parameter : Response code (200 or 4040)
+            Generate response Header
+            404 or 200 status
+        """
+        header = ''
+        if response_code == 200:
+            header += 'HTTP/1.1 200 OK\n'
+        elif response_code == 404:
+            header += 'HTTP/1.1 404 Not Found\n'
 
+        header += 'Server: Behnam&Morteza-server \n'
+        header += 'Connection: close\n\n'  # Signal that connection will be closed after completing the request
+        return header
 
+    def printLine(self):
+        """print line !"""
+        print('-------------------------------------------------')
 
-def _generate_headers(response_code):
-    """
-        Parameter : Response code (200 or 4040)
-        Generate response Header
-        404 or 200 status
-    """
-    header = ''
-    if response_code == 200:
-        header += 'HTTP/1.1 200 OK\n'
-    elif response_code == 404:
-        header += 'HTTP/1.1 404 Not Found\n'
+    def request_handler(self):
+        """make loop and accpeting signal of socket making appropriate response
+            close the signal
+        """
 
-    # time_now = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
-    # header += 'Date: {now}\n'.format(now=time_now)
-    header += 'Server: Behnam&Morteza-server \n'
-    header += 'Connection: close\n\n'  # Signal that connection will be closed after completing the request
-    return header
+        size = 1024
+        while True:
+            # accept message from client
+            clientSock, addr = self.socket.accept()
+            self.printLine()
+            print('connect to {}'.format(addr))
 
+            # print client message content
+            msg = clientSock.recv(size).decode('utf-8')
+            self.printLine()
+            print(msg)
 
-port = 8080
-ip = ''
-# create port
-sok = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# make connection with port and ip
-sok.bind((ip, port))
+            # check for existance of file in the server (with name of file.txt)
+            data, isFileExist = self.send_file_handler(clientSock, self.fileName)
 
-# listening to the port
-sok.listen(5)
+            print('data of file -----------------------')
+            print(data)
 
-rscvPort = 8000
-size = 1024
-while True:
-    clientSock, addr = sok.accept()
-    print('connect to {}'.format(addr))
-    binaryMsg = clientSock.recv(size)
-    msg = binaryMsg.decode('utf-8')
+            # create  header for response message
+            if isFileExist:
+                header = self._generate_headers(200)
+                response = header.encode() + data.encode()
+            else:
+                header = self._generate_headers(404)
+                response = header
+            # send response in http protocol
+            clientSock.send(response)
 
-    print('print msg  --------------------------------- ')
-    print(msg)
-
-
-    # print('socket name {}'.format(clientSock.getsockname()))
-    response = ''
-    data,isFileExist= send_file_handler(socket=clientSock)
-
-    print('data of file -----------------------')
-    print(data)
-    if isFileExist:
-        header = _generate_headers(200)
-        response = header.encode() + data.encode()
-    else:
-        header = _generate_headers(404)
-        response = header
-    clientSock.send(response)
-    clientSock.close()
+            # close the signal
+            clientSock.close()
