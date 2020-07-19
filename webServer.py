@@ -1,10 +1,15 @@
-import http.server as server
+
 import socket
-import time
-import json
+
 
 
 def send_file_handler(socket, fileName='file.txt'):
+    """
+
+    :param socket:
+    :param fileName: we use default file name in this server
+    :return: data of file(string) and isFileExist (boolean)
+    """
     data = ''
     try:
         f = open(fileName, 'rb')
@@ -26,11 +31,9 @@ def send_file_handler(socket, fileName='file.txt'):
 
 def _generate_headers(response_code):
     """
-    Generate HTTP response headers.
-    Parameters:
-        - response_code: HTTP response code to add to the header. 200 and 404 supported
-    Returns:
-        A formatted HTTP header for the given response_code
+        Parameter : Response code (200 or 4040)
+        Generate response Header
+        404 or 200 status
     """
     header = ''
     if response_code == 200:
