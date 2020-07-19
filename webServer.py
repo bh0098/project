@@ -65,13 +65,17 @@ while True:
     print('connect to {}'.format(addr))
     binaryMsg = clientSock.recv(size)
     msg = binaryMsg.decode('utf-8')
-    print('print msg : ', msg)
-    matches = msg.split()
+
+    print('print msg  --------------------------------- ')
+    print(msg)
+
 
     # print('socket name {}'.format(clientSock.getsockname()))
     response = ''
     data,isFileExist= send_file_handler(socket=clientSock)
-    print('data of file :',data)
+
+    print('data of file -----------------------')
+    print(data)
     if isFileExist:
         header = _generate_headers(200)
         response = header.encode() + data.encode()
@@ -79,5 +83,4 @@ while True:
         header = _generate_headers(404)
         response = header
     clientSock.send(response)
-    # clientSock.send(bytes('thanks','utf-8'))
     clientSock.close()
