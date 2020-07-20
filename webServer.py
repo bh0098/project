@@ -38,7 +38,9 @@ class WebServer:
             f.close()
             return data, True
         except:
-            print("file not exist")
+            msg = "file not exist"
+            print(msg)
+            data = msg
             return data, False
 
     def _set_fileName(self, msg):
@@ -105,10 +107,11 @@ class WebServer:
             # create  header for response message
             if isFileExist:
                 header = self._generate_headers(200)
-                response = header.encode() + data.encode()
             else:
                 header = self._generate_headers(404)
-                response = header.encode()
+
+            response = header.encode() + data.encode()
+
             # send response in http protocol
             clientSock.send(response)
 
