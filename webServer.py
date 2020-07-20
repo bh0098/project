@@ -108,7 +108,7 @@ class WebServer:
                 response = header.encode() + data.encode()
             else:
                 header = self._generate_headers(404)
-                response = header
+                response = header.encode()
             # send response in http protocol
             clientSock.send(response)
 
