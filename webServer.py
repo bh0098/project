@@ -22,7 +22,7 @@ class WebServer:
         self.printLine()
         print("start for listening ")
 
-    def send_file_handler(self):
+    def _send_file_handler(self):
 
         """
             :param fileName: we use default file name in this server
@@ -40,6 +40,19 @@ class WebServer:
         except:
             print("file not exist")
             return data, False
+
+    def _set_fileName(self, msg):
+        """
+
+        :param msg : msg of signal
+        set global variable of fileName if file name sent in url var set to file name
+        else default file name read from constructor(when initiate webServer calss for
+        first time )
+        """
+        file  =msg.splitlines()[0].split('/')[1].split(' ')[0]
+        if (file != ''):
+            self.fileName = file
+        print("file name:",self.fileName)
 
     def _generate_headers(self, response_code):
         """
@@ -79,8 +92,11 @@ class WebServer:
             print("sent message :")
             print(msg)
 
+            self.printLine()
+            self._set_fileName(msg)
+
             # check for existance of file in the server (with name of file.txt)
-            data, isFileExist = self.send_file_handler()
+            data, isFileExist = self._send_file_handler()
 
             self.printLine()
             print('data of file :')
