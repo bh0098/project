@@ -2,7 +2,7 @@ from webServer import WebServer
 
 port = 8080
 ip = ''
-file = 'file.txt'
+file = 'home.html'
 
 server = WebServer(port, ip, file)
 server.start()

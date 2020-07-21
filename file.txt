@@ -1,1 +1,1 @@
-data = "nokaram"
+this if file content

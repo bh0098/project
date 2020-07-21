@@ -8,7 +8,7 @@ class WebServer:
         self.ip = ip
         self.listenNumber = 1
         self.packetSize = 1024
-        self.socket = self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.fileName = fileName
 
     def start(self):
@@ -36,12 +36,18 @@ class WebServer:
                 data += line.decode('utf-8')
                 line = f.read(1024)
             f.close()
-            return data, True
+            isFileExist = True
         except:
-            msg = "file not exist"
-            print(msg)
-            data = msg
-            return data, False
+            f = open("not_found.html", 'rb')
+            line = f.read(1024)
+            while (line):
+                data += line.decode('utf-8')
+                line = f.read(1024)
+            f.close()
+            print("file not exist")
+            isFileExist = False
+        finally:
+            return data, isFileExist
 
     def _set_fileName(self, msg):
         """
@@ -51,10 +57,13 @@ class WebServer:
         else default file name read from constructor(when initiate webServer calss for
         first time )
         """
-        file  =msg.splitlines()[0].split('/')[1].split(' ')[0]
-        if (file != ''):
-            self.fileName = file
-        print("file name:",self.fileName)
+        file = ''
+        try:
+            file  =msg.splitlines()[0].split('/')[1].split(' ')[0]
+            if (file != ''):
+                self.fileName = file
+        finally:
+            print("file name:",self.fileName)
 
     def _generate_headers(self, response_code):
         """
